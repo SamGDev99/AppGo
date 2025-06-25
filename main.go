@@ -17,34 +17,50 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Se debe crear cliente personalizado para realizar solicitud HTTP
-		client := &http.Client{}
-		//Solicitud a API
-		req, err := http.NewRequest("GET", "https://8j5baasof2.execute-api.us-west-2.amazonaws.com/production/swechallenge/list", nil)
-		if err != nil {
-			http.Error(w, "Error creando solicitud", http.StatusInternalServerError)
-			return
-		}
-		// Añadir token
-		req.Header.Add("Authorization", "Bearer "+token)
-
-		resp, err := client.Do(req)
-		if err != nil {
-			http.Error(w, "Error obteniendo datos", http.StatusInternalServerError)
-			return
-		}
-
-		defer resp.Body.Close()
-
-		// Leer respuesta
-		bodyBytes, err := io.ReadAll(resp.Body)
-		if err != nil {
-			http.Error(w, "Error leyendo cuerpo de respuesta", http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(bodyBytes)
-
+		handler(w, r, token)
 	})
+
+	http.HandleFunc("/prueba", handler2)
 	http.ListenAndServe(":9000", nil)
+}
+
+func handler(w http.ResponseWriter, _ *http.Request, token string) {
+	resp, err := solicitudAPI(token)
+	if err != nil {
+		http.Error(w, "Error en solicitud a la API: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	// Leer respuesta
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "Error leyendo cuerpo de respuesta", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(bodyBytes)
+
+}
+
+func solicitudAPI(token string) (*http.Response, error) {
+	// Se debe crear cliente personalizado para realizar solicitud HTTP
+	client := &http.Client{}
+	//Solicitud a API
+	req, err := http.NewRequest("GET", "https://8j5baasof2.execute-api.us-west-2.amazonaws.com/production/swechallenge/list", nil)
+	if err != nil {
+		return nil, err
+	}
+	// Añadir token
+	req.Header.Add("Authorization", "Bearer "+token)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func handler2(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Probando url")
 }
