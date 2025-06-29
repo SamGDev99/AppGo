@@ -3,25 +3,53 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
-	"os"
+	//"os"
 )
 
 func main() {
-	// Obtener token del sistema
-	// Se debe ejecutar export BEARER_TOKEN="" en la terminal antes de correr el código
-	token := os.Getenv("BEARER_TOKEN")
-	if token == "" {
-		fmt.Println("Ocurrió un error al recibir el token")
-		return
+	conexionBD()
+
+	datos, err := extraerDatos()
+	if err != nil {
+		log.Fatal("Ocurrió un error al extraer los datos de la API", err)
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		handler(w, r, token)
-	})
+	err = guardarDatos(datos)
+	if err != nil {
+		log.Fatal("Error al guardar la información: ", err)
+	}
 
-	http.HandleFunc("/prueba", handler2)
-	http.ListenAndServe(":9000", nil)
+	fmt.Println("Operación exitosa")
+
+	/*
+		info := Data{
+			Ticker:      "AKBA",
+			Company:     "Akebia Therapeutics",
+			Brokerage:   "HC Wainwright",
+			Action:      "initiated by",
+			Rating_from: "Buy",
+			Rating_to:   "Buy",
+			Target_from: "$8.00",
+			Target_to:   "$8.00",
+		}
+		result := DB.Create(&info)
+		if result.Error != nil {
+			log.Fatal("Ocurrió un error al crear el registro: ", result.Error)
+		} else {
+			fmt.Println("Se guardó registro con el ID: ", info.ID)
+		}
+
+
+			http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+				handler(w, r, token)
+			})
+
+			http.HandleFunc("/prueba", handler2)
+			http.ListenAndServe(":9000", nil)
+	*/
+
 }
 
 func handler(w http.ResponseWriter, _ *http.Request, token string) {
