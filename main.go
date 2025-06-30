@@ -2,91 +2,61 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
-	//"os"
 )
 
 func main() {
+	// Nos conectamos a la BD
 	conexionBD()
 
-	datos, err := extraerDatos()
+	// Consultamos si ya cargamos la información de la API en la BD
+	registros, err := consultarDatos()
 	if err != nil {
-		log.Fatal("Ocurrió un error al extraer los datos de la API", err)
+		log.Fatal("Error al consultar los registros: ", err)
 	}
+	// Si no hemos cargado nada, procedemos a consultar la API y cargar la información
+	if registros == 0 {
+		datos, err := extraerDatos()
+		if err != nil {
+			log.Fatal("Ocurrió un error al extraer los datos de la API", err)
+		}
 
-	err = guardarDatos(datos)
-	if err != nil {
-		log.Fatal("Error al guardar la información: ", err)
+		err = guardarDatos(datos)
+		if err != nil {
+			log.Fatal("Error al guardar la información: ", err)
+		}
+
+		fmt.Println("Se extraen datos de la API y se guardan de forma exitosa")
+	} else {
+		fmt.Println("La BD ya tiene información. No se consulta la API")
 	}
-
-	fmt.Println("Operación exitosa")
 
 	/*
-		info := Data{
-			Ticker:      "AKBA",
-			Company:     "Akebia Therapeutics",
-			Brokerage:   "HC Wainwright",
-			Action:      "initiated by",
-			Rating_from: "Buy",
-			Rating_to:   "Buy",
-			Target_from: "$8.00",
-			Target_to:   "$8.00",
-		}
-		result := DB.Create(&info)
-		if result.Error != nil {
-			log.Fatal("Ocurrió un error al crear el registro: ", result.Error)
-		} else {
-			fmt.Println("Se guardó registro con el ID: ", info.ID)
-		}
-
-
-			http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-				handler(w, r, token)
-			})
-
-			http.HandleFunc("/prueba", handler2)
-			http.ListenAndServe(":9000", nil)
+		// Probando inserción de un solo dato
+			info := Data{
+				Ticker:      "AKBA",
+				Company:     "Akebia Therapeutics",
+				Brokerage:   "HC Wainwright",
+				Action:      "initiated by",
+				Rating_from: "Buy",
+				Rating_to:   "Buy",
+				Target_from: "$8.00",
+				Target_to:   "$8.00",
+			}
+			result := DB.Create(&info)
+			if result.Error != nil {
+				log.Fatal("Ocurrió un error al crear el registro: ", result.Error)
+			} else {
+				fmt.Println("Se guardó registro con el ID: ", info.ID)
+			}
 	*/
 
-}
+	http.HandleFunc("/api/datos", handler)
+	http.HandleFunc("/prueba", handler2)
+	fmt.Println("Servidor escuchando en http://localhost:9000")
+	http.ListenAndServe(":9000", nil)
 
-func handler(w http.ResponseWriter, _ *http.Request, token string) {
-	resp, err := solicitudAPI(token)
-	if err != nil {
-		http.Error(w, "Error en solicitud a la API: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer resp.Body.Close()
-	// Leer respuesta
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		http.Error(w, "Error leyendo cuerpo de respuesta", http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(bodyBytes)
-
-}
-
-func solicitudAPI(token string) (*http.Response, error) {
-	// Se debe crear cliente personalizado para realizar solicitud HTTP
-	client := &http.Client{}
-	//Solicitud a API
-	req, err := http.NewRequest("GET", "https://8j5baasof2.execute-api.us-west-2.amazonaws.com/production/swechallenge/list", nil)
-	if err != nil {
-		return nil, err
-	}
-	// Añadir token
-	req.Header.Add("Authorization", "Bearer "+token)
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
 }
 
 func handler2(w http.ResponseWriter, r *http.Request) {
