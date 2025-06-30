@@ -16,3 +16,14 @@ type APIResponse struct {
 	Items    []Data `json:"items"`
 	NextPage string `json:"next_page"`
 }
+
+type DataResponse struct {
+	Ticker      string `json:"ticker"`
+	Company     string `json:"company"`
+	Brokerage   string `json:"brokerage"`
+	Action      string `json:"action"`
+	Rating_from string `json:"rating_from"`
+	Rating_to   string `json:"rating_to"`
+	Target_from string `json:"target_from"`
+	Target_to   string `json:"target_to"`
+}
