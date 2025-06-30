@@ -1,9 +1,11 @@
 package main
 
 import (
-	"fmt" // para imprimir en consola
-	"log" // para generar logs
-	"os"  // para sacar las variables del enviroment
+	"fmt"     // para imprimir en consola
+	"log"     // para generar logs
+	"os"      // para sacar las variables del enviroment
+	"strconv" // para convertir los strings de los números
+	"strings" // para eliminar simbolo de $ y ,
 
 	"github.com/joho/godotenv" // para asignar el .env
 	"gorm.io/driver/postgres"  // driver de bd
@@ -73,21 +75,39 @@ func obtenerRegistros() ([]DataResponse, error) {
 	if result.Error != nil {
 		return nil, result.Error
 	}
-
 	var respuesta []DataResponse
 	for _, v := range datos {
+
+		target_from, err := parseCleanFloat(v.Target_from)
+		if err != nil {
+			log.Printf("Error al convertir target_from: %v", err)
+			return nil, err
+		}
+		target_to, err := parseCleanFloat(v.Target_to)
+		if err != nil {
+			log.Printf("Error al convertir target_from: %v", err)
+			return nil, err
+		}
+
 		respuesta = append(respuesta, DataResponse{
+			ID:          v.ID,
 			Ticker:      v.Ticker,
 			Company:     v.Company,
 			Brokerage:   v.Brokerage,
 			Action:      v.Action,
 			Rating_from: v.Rating_from,
 			Rating_to:   v.Rating_to,
-			Target_from: v.Target_from,
-			Target_to:   v.Target_to,
+			Target_from: target_from,
+			Target_to:   target_to,
 		})
 	}
 
 	return respuesta, nil
 
+}
+
+func parseCleanFloat(value string) (float64, error) {
+	cleaned := strings.ReplaceAll(value, "$", "")
+	cleaned = strings.ReplaceAll(cleaned, ",", "")
+	return strconv.ParseFloat(cleaned, 64)
 }
