@@ -41,13 +41,53 @@ func conexionBD() {
 }
 
 func guardarDatos(datos []Data) error {
-	for _, v := range datos {
-		result := DB.Create(&v)
-		if result.Error != nil {
-			return result.Error
+	result := DB.CreateInBatches(&datos, 100)
+	if result.Error != nil {
+		return result.Error
+	}
+	/*
+		for _, v := range datos {
+			result := DB.Create(&v)
+			if result.Error != nil {
+				return result.Error
+			}
+			fmt.Printf("Insertando: %+v\n", v)
 		}
-		fmt.Printf("Insertando: %+v\n", v)
+	*/
+	return nil
+}
+
+func consultarDatos() (int64, error) {
+	var registros int64
+	result := DB.Model(&Data{}).Count(&registros)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return registros, nil
+}
+
+func obtenerRegistros() ([]DataResponse, error) {
+	var datos []Data
+
+	result := DB.Model(&Data{}).Find(&datos)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
-	return nil
+	var respuesta []DataResponse
+	for _, v := range datos {
+		respuesta = append(respuesta, DataResponse{
+			Ticker:      v.Ticker,
+			Company:     v.Company,
+			Brokerage:   v.Brokerage,
+			Action:      v.Action,
+			Rating_from: v.Rating_from,
+			Rating_to:   v.Rating_to,
+			Target_from: v.Target_from,
+			Target_to:   v.Target_to,
+		})
+	}
+
+	return respuesta, nil
+
 }
