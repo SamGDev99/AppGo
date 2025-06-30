@@ -8,6 +8,11 @@ import (
 )
 
 func enviarDatos(w http.ResponseWriter, r *http.Request) {
+	enableCors(w)
+
+	if r.Method == http.MethodOptions {
+		return // No se debe continuar, solo responder 200 OK
+	}
 
 	datos, err := obtenerRegistros()
 	if err != nil {
@@ -15,7 +20,11 @@ func enviarDatos(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(datos)
+	err = json.NewEncoder(w).Encode(datos)
+	if err != nil {
+		log.Printf("Error al codificar respuesta JSON: %v", err)
+		http.Error(w, "Error al codificar datos", http.StatusInternalServerError)
+	}
 
 }
 
