@@ -27,4 +27,5 @@ type DataResponse struct {
 	Rating_to   string  `json:"rating_to"`
 	Target_from float64 `json:"target_from"`
 	Target_to   float64 `json:"target_to"`
+	Score       *int    `json:"score,omitempty"`
 }

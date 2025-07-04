@@ -51,3 +51,29 @@ func cargarDatos(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "La BD ya tiene información. No se consulta la API")
 	}
 }
+
+func enviarCalificaciones(w http.ResponseWriter, r *http.Request) {
+	enableCors(w)
+
+	if r.Method == http.MethodOptions {
+		return // No se debe continuar, solo responder 200 OK
+	}
+
+	datos, err := obtenerRegistros()
+	if err != nil {
+		http.Error(w, "Error al obtener los registros de la BD: ", http.StatusInternalServerError)
+	}
+
+	datosProcesados, err := calcularAcciones(datos)
+	if err != nil {
+		http.Error(w, "Error al procesar los datos: ", http.StatusInternalServerError)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(datosProcesados)
+	if err != nil {
+		log.Printf("Error al codificar respuesta JSON: %v", err)
+		http.Error(w, "Error al codificar datos", http.StatusInternalServerError)
+	}
+
+}

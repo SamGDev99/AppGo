@@ -1,19 +1,39 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import Tabla from './components/Tabla.vue';
 import Tarjeta from './components/Tarjeta.vue';
 import Titulo from './components/Titulo.vue';
 
-const mejorAccion = {
-  ticker: 'AAPL',
-  target_to: 230.15,
-  variacion: 67.81
+interface Accion {
+  ID: number
+  ticker: string
+  company: string
+  brokerage: string
+  action: string
+  rating_from: string
+  rating_to: string
+  target_from: number
+  target_to: number
+  score: number
 }
 
-const peorAccion = {
-  ticker: 'TSLA',
-  target_to: 100.55,
-  variacion: -42.24
-}
+const mejorAccion = ref<Accion | null>(null)
+const peorAccion = ref<Accion | null>(null)
+
+onMounted(async () => {
+  try {
+    const response = await fetch('http://localhost:9000/calcularDatos')
+    const data = await response.json()
+
+    if (Array.isArray(data) && data.length === 2) {
+      mejorAccion.value = data[0]
+      peorAccion.value = data[1]
+    }
+  } catch (error) {
+    console.error('Error al cargar los datos:', error)
+  }
+})
+
 </script>
 
 <template>
@@ -23,15 +43,21 @@ const peorAccion = {
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Tarjeta
+          v-if="mejorAccion"
           label="Mejor Acción"
-          :value="mejorAccion.ticker + ' - $' + mejorAccion.target_to"
-          :percentage="mejorAccion.variacion"
+          :value="`${mejorAccion.ticker} - $${mejorAccion.target_to}`"
+          :score="mejorAccion.score"
+          :broker="mejorAccion.brokerage"
+          :company-name="mejorAccion.company"
           trend="up"
         />
         <Tarjeta
+          v-if="peorAccion"
           label="Peor Acción"
-          :value="peorAccion.ticker + ' - $' + peorAccion.target_to"
-          :percentage="peorAccion.variacion"
+          :value="`${peorAccion.ticker} - $${peorAccion.target_to}`"
+          :score="peorAccion.score"
+          :broker="peorAccion.brokerage"
+          :company-name="peorAccion.company"
           trend="down"
         />
       </div>

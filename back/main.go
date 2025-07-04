@@ -31,6 +31,7 @@ func main() {
 
 	http.HandleFunc("/api/datos", enviarDatos)
 	http.HandleFunc("/cargarDatos", cargarDatos)
+	http.HandleFunc("/calcularDatos", enviarCalificaciones)
 	http.HandleFunc("/prueba", handler2)
 	fmt.Println("Servidor escuchando en http://localhost:9000")
 	http.ListenAndServe(":9000", nil)
