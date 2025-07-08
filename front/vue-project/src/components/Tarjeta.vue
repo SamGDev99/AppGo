@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, computed } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps<{
   label: string
@@ -18,7 +18,7 @@ const color = computed(() => {
 </script>
 
 <template>
-  <article class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
+  <div class="flex items-end justify-between rounded-lg border border-gray-100 bg-white p-6">
     <div class="flex items-center gap-4">
       <span class="hidden rounded-full bg-gray-100 p-2 text-gray-600 sm:block">
         <svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -47,5 +47,5 @@ const color = computed(() => {
       </template>
       <span>Score {{ score }}</span>
     </div>
-  </article>
+  </div>
 </template>
