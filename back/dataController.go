@@ -17,13 +17,13 @@ func enviarDatos(w http.ResponseWriter, r *http.Request) {
 	datos, err := obtenerRegistros()
 	if err != nil {
 		http.Error(w, "Error al obtener los registros de la BD: ", http.StatusInternalServerError)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(datos)
-	if err != nil {
-		log.Printf("Error al codificar respuesta JSON: %v", err)
-		http.Error(w, "Error al codificar datos", http.StatusInternalServerError)
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		err = json.NewEncoder(w).Encode(datos)
+		if err != nil {
+			log.Printf("Error al codificar respuesta JSON: %v", err)
+			http.Error(w, "Error al codificar datos", http.StatusInternalServerError)
+		}
 	}
 
 }
@@ -32,7 +32,8 @@ func cargarDatos(w http.ResponseWriter, r *http.Request) {
 	// Consultamos si ya cargamos la información de la API en la BD
 	registros, err := consultarDatos()
 	if err != nil {
-		log.Fatal("Error al consultar los registros: ", err)
+		log.Print("Error al consultar los registros: ", err)
+		http.Error(w, "Error al consultar los registros", http.StatusInternalServerError)
 	}
 	// Si no hemos cargado nada, procedemos a consultar la API y cargar la información
 	if registros == 0 {
