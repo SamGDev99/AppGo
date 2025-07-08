@@ -1,5 +1,25 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import i18next from 'i18next';
+
+i18next.init({
+  lng: 'es',
+  debug: true,
+  resources: {
+    es: {
+      translation: {
+        "Ticker": "Código Acción",
+        "Company": "Empresa",
+        "Brokerage": "Corredor",
+        "Action": "Acción",
+        "Rating from": "Calificación inicial",
+        "Rating to": "Calificación actual",
+        "Target from": "Valor inicial",
+        "Target to": "Valor actual"
+      }
+    }
+  }
+});
 
 interface Data {
   ID: number;
@@ -113,19 +133,19 @@ function goToPage(page: number) {
       <table class="min-w-full divide-y divide-gray-200 rounded shadow text-sm">
         <thead class="bg-gray-100 sticky top-0 z-10">
           <tr class="text-left text-gray-700">
-            <th class="px-3 py-2">Ticker</th>
-            <th class="px-3 py-2">Company</th>
-            <th class="px-3 py-2">Brokerage</th>
-            <th class="px-3 py-2">Action</th>
-            <th class="px-3 py-2">Rating From</th>
-            <th class="px-3 py-2">Rating To</th>
+            <th class="px-3 py-2">{{i18next.t("Ticker")}}</th>
+            <th class="px-3 py-2">{{i18next.t("Company")}}</th>
+            <th class="px-3 py-2">{{i18next.t("Brokerage")}}</th>
+            <th class="px-3 py-2">{{ i18next.t("Action") }}</th>
+            <th class="px-3 py-2">{{ i18next.t("Rating from") }}</th>
+            <th class="px-3 py-2">{{ i18next.t("Rating to") }}</th>
             <th class="px-3 py-2 cursor-pointer" @click="toggleSort('target_from')">
                 <span v-if="sortKey === 'target_from'">{{ sortAsc ? '↑' : '↓' }}</span>
-                Target From
+                {{ i18next.t("Target from") }}
             </th>
             <th class="px-3 py-2 cursor-pointer" @click="toggleSort('target_to')">
                 <span v-if="sortKey === 'target_to'">{{ sortAsc ? '↑' : '↓' }}</span>
-                Target To
+                {{ i18next.t("Target to") }}
             </th>
           </tr>
         </thead>

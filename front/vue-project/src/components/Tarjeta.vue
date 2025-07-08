@@ -1,5 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import i18next from 'i18next';
+
+i18next.init({
+  lng: 'es',
+  debug: true,
+  resources: {
+    es: {
+      translation: {
+        "Score": "Puntaje",
+        "Broker": "Corredor"
+      }
+    }
+  }
+});
 
 const props = defineProps<{
   label: string
@@ -30,7 +44,7 @@ const color = computed(() => {
         <p class="text-sm text-gray-500">{{ label }}</p>
         <p class="text-2xl font-medium text-gray-900">{{ value }}</p>
         <p class="text-sm text-gray-600">{{ companyName }}</p>
-        <p class="text-sm text-gray-500">Broker: {{ broker }}</p>
+        <p class="text-sm text-gray-500">{{i18next.t('Broker')}} {{ broker }}</p>
       </div>
     </div>
 
@@ -45,7 +59,7 @@ const color = computed(() => {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
         </svg>
       </template>
-      <span>Score {{ score }}</span>
+      <span>{{i18next.t('Score')}} {{ score }}</span>
     </div>
   </div>
 </template>
