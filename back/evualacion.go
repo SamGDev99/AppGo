@@ -47,9 +47,7 @@ func calcularAcciones(datos []DataResponse) ([]DataResponse, error) {
 		score := 0
 
 		// Score por Action
-		if s, ok := actionScores[d.Action]; ok {
-			score += s
-		}
+		score += actionScores[d.Action]
 
 		// Score por Rating
 		fromScore := ratingScores[d.Rating_from]
@@ -63,15 +61,17 @@ func calcularAcciones(datos []DataResponse) ([]DataResponse, error) {
 	}
 
 	sort.Slice(datos, func(i, j int) bool {
-		if datos[i].Score == nil && datos[j].Score == nil {
-			return false
-		}
-		if datos[i].Score == nil {
-			return false
-		}
-		if datos[j].Score == nil {
-			return true
-		}
+		/*
+			if datos[i].Score == nil && datos[j].Score == nil {
+				return false
+			}
+			if datos[i].Score == nil {
+				return false
+			}
+			if datos[j].Score == nil {
+				return true
+			}
+		*/
 		return *datos[i].Score > *datos[j].Score
 	})
 
